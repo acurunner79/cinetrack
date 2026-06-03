@@ -48,3 +48,11 @@ export function getTv(tvId, append = "") {
   const params = append ? { append_to_response: append } : {};
   return api.get(`/tv/${tvId}`, params);
 }
+
+export function getSeason(tvId, seasonNumber) {
+  return api.get(`/tv/${tvId}/season/${seasonNumber}`);
+}
+
+export function getEpisode(tvId, seasonNumber, episodeNumber) {
+  return api.get(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`);
+}

@@ -16,6 +16,7 @@ import CallbackPage from "./pages/auth/CallbackPage";
 import { lazy, Suspense } from "react";
 const HomePage        = lazy(() => import("./pages/home/HomePage"));
 const MovieDetailPage = lazy(() => import("./pages/movies/MovieDetailPage"));
+const TvDetailPage    = lazy(() => import("./pages/tv/TvDetailPage"));
 const SearchPage      = lazy(() => import("./pages/search/SearchPage"));
 const WatchlistPage   = lazy(() => import("./pages/account/WatchlistPage"));
 
@@ -61,6 +62,14 @@ const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<Loading />}>
                     <MovieDetailPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "/tv/:id",
+                element: (
+                  <Suspense fallback={<Loading />}>
+                    <TvDetailPage />
                   </Suspense>
                 ),
               },
