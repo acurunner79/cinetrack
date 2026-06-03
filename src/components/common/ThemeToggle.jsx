@@ -11,7 +11,11 @@ export default function ThemeToggle() {
       aria-label={`Switch to ${isTaytay ? "dark" : "Taytay"} theme`}
       title={`Switch to ${isTaytay ? "dark" : "Taytay"} theme`}
     >
-      <span className="theme-toggle-icon">{isTaytay ? "🌙" : "✨"}</span>
+      <img
+        className="theme-toggle-icon"
+        src={isTaytay ? "/batman.png" : "/taytay.png"}
+        alt={isTaytay ? "Batman" : "Taylor Swift"}
+      />
       <span className="theme-toggle-label">
         {isTaytay ? "Dark" : "Taytay"}
       </span>
