@@ -15,7 +15,9 @@ import CallbackPage from "./pages/auth/CallbackPage";
 // Lazy-load everything post-MVP so the auth bundle stays small
 import { lazy, Suspense } from "react";
 const HomePage        = lazy(() => import("./pages/home/HomePage"));
+const MoviesPage      = lazy(() => import("./pages/movies/MoviesPage"));
 const MovieDetailPage = lazy(() => import("./pages/movies/MovieDetailPage"));
+const TvPage          = lazy(() => import("./pages/tv/TvPage"));
 const TvDetailPage    = lazy(() => import("./pages/tv/TvDetailPage"));
 const SearchPage      = lazy(() => import("./pages/search/SearchPage"));
 const WatchlistPage   = lazy(() => import("./pages/account/WatchlistPage"));
@@ -59,10 +61,26 @@ const router = createBrowserRouter([
                 ),
               },
               {
+                path: "/movies",
+                element: (
+                  <Suspense fallback={<Loading />}>
+                    <MoviesPage />
+                  </Suspense>
+                ),
+              },
+              {
                 path: "/movies/:id",
                 element: (
                   <Suspense fallback={<Loading />}>
                     <MovieDetailPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "/tv",
+                element: (
+                  <Suspense fallback={<Loading />}>
+                    <TvPage />
                   </Suspense>
                 ),
               },

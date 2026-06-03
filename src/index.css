@@ -1340,3 +1340,121 @@ h1, h2, h3 { line-height: 1.2; }
   .person-photo { width: 120px; }
   .person-name  { font-size: 1.5rem; }
 }
+
+/* ================================================================
+   BROWSE PAGE (Movies + TV)
+   ================================================================ */
+.browse-page { padding-top: 0.5rem; }
+
+.browse-header { margin-bottom: 1.25rem; }
+.browse-title {
+  font-size: 1.6rem; font-weight: 700; color: var(--color-text-primary);
+}
+[data-theme="taytay"] .browse-title { font-family: Georgia, serif; color: var(--color-accent); }
+.browse-count { font-size: 0.85rem; color: var(--color-text-muted); margin-top: 4px; }
+
+/* Filter row */
+.browse-filters {
+  display: flex; align-items: flex-end; gap: 1rem;
+  flex-wrap: wrap; margin-bottom: 1rem;
+}
+
+.browse-filter-group {
+  display: flex; flex-direction: column; gap: 4px;
+}
+
+.browse-filter-label {
+  font-size: 0.72rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--color-text-muted);
+}
+
+.browse-select {
+  appearance: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 7px 32px 7px 12px;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  cursor: pointer;
+  /* Custom arrow */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color 0.15s;
+  min-width: 160px;
+}
+.browse-select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(1,180,228,0.12);
+}
+[data-theme="taytay"] .browse-select:focus {
+  box-shadow: 0 0 0 2px rgba(232,98,26,0.12);
+}
+
+.browse-clear {
+  font-size: 0.8rem; color: var(--color-text-muted);
+  padding: 7px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition: color 0.15s, border-color 0.15s;
+  align-self: flex-end;
+}
+.browse-clear:hover { color: var(--color-error); border-color: var(--color-error); }
+
+/* Genre pill row */
+.browse-genre-pills {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.browse-genre-pill {
+  font-size: 0.78rem; font-weight: 500;
+  padding: 4px 12px; border-radius: 20px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  transition: all 0.15s; white-space: nowrap;
+}
+.browse-genre-pill:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+.browse-genre-pill--active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-text);
+}
+[data-theme="taytay"] .browse-genre-pill--active {
+  background: linear-gradient(135deg, #e8621a, #c8972a);
+  border-color: #e8621a;
+}
+
+/* Results grid */
+.browse-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 20px 12px;
+}
+
+.browse-state {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 300px; color: var(--color-text-muted); font-size: 0.9rem;
+}
+.browse-state--error { color: var(--color-error); }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .browse-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 16px 10px; }
+  .browse-select { min-width: 130px; }
+}
+
+@media (max-width: 480px) {
+  .browse-filters { gap: 0.75rem; }
+  .browse-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px 8px; }
+  .browse-genre-pills { gap: 4px; }
+  .browse-genre-pill { font-size: 0.72rem; padding: 3px 10px; }
+}

@@ -58,9 +58,25 @@ export function getEpisode(tvId, seasonNumber, episodeNumber) {
 }
 
 // -------------------------------------------------------------------
-// People
-// append combined_credits to get both movie + TV credits in one call
+// Discover — flexible filter + sort for browse pages
+// params: { sort_by, with_genres, page, ... }
 // -------------------------------------------------------------------
+export function discoverMovies(params = {}) {
+  return api.get("/discover/movie", { page: 1, ...params });
+}
+
+export function discoverTv(params = {}) {
+  return api.get("/discover/tv", { page: 1, ...params });
+}
+
+// Genre lists (call once, cache in component)
+export function getMovieGenres() {
+  return api.get("/genre/movie/list");
+}
+
+export function getTvGenres() {
+  return api.get("/genre/tv/list");
+}
 export function getPerson(personId, append = "") {
   const params = append ? { append_to_response: append } : {};
   return api.get(`/person/${personId}`, params);
