@@ -1,16 +1,12 @@
 import MediaCard from "./MediaCard";
-import Spinner from "./Spinner";
+import { SkeletonShelf } from "./Skeleton";
 
 export default function MediaShelf({ title, items, loading, error, type }) {
+  if (loading) return <SkeletonShelf count={8} />;
+
   return (
     <section className="shelf">
       <h2 className="shelf-title">{title}</h2>
-
-      {loading && (
-        <div className="shelf-state">
-          <Spinner />
-        </div>
-      )}
 
       {error && (
         <div className="shelf-state shelf-state--error">
@@ -18,11 +14,11 @@ export default function MediaShelf({ title, items, loading, error, type }) {
         </div>
       )}
 
-      {!loading && !error && items?.length === 0 && (
+      {!error && items?.length === 0 && (
         <div className="shelf-state">Nothing here yet.</div>
       )}
 
-      {!loading && !error && items?.length > 0 && (
+      {!error && items?.length > 0 && (
         <div className="shelf-track">
           {items.map((item) => (
             <MediaCard

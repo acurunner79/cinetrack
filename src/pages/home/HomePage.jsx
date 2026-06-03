@@ -8,15 +8,24 @@ import {
   getAiringToday,
 } from "../../api/media";
 import MediaShelf from "../../components/common/MediaShelf";
+import { Skeleton } from "../../components/common/Skeleton";
 import { backdropUrl } from "../../utils/tmdbImage";
 
-function HeroBanner({ item }) {
+function HeroBanner({ item, loading }) {
+  if (loading) {
+    return (
+      <div className="hero hero--skeleton">
+        <Skeleton width="100%" height="100%" radius={0} />
+      </div>
+    );
+  }
+
   if (!item) return null;
 
-  const title = item.title ?? item.name;
+  const title    = item.title ?? item.name;
   const overview = item.overview;
-  const year = (item.release_date ?? item.first_air_date)?.slice(0, 4);
-  const bg = backdropUrl(item.backdrop_path, "lg");
+  const year     = (item.release_date ?? item.first_air_date)?.slice(0, 4);
+  const bg       = backdropUrl(item.backdrop_path, "lg");
 
   return (
     <div
@@ -38,12 +47,11 @@ function HeroBanner({ item }) {
 export default function HomePage() {
   const { account } = useAuth();
 
-  const trending    = useTmdb(() => getTrending("all", "day"),   []);
-  const nowPlaying  = useTmdb(() => getNowPlaying(),             []);
-  const topRated    = useTmdb(() => getTopRatedMovies(),         []);
-  const airingToday = useTmdb(() => getAiringToday(),            []);
+  const trending    = useTmdb(() => getTrending("all", "day"),  []);
+  const nowPlaying  = useTmdb(() => getNowPlaying(),            []);
+  const topRated    = useTmdb(() => getTopRatedMovies(),        []);
+  const airingToday = useTmdb(() => getAiringToday(),           []);
 
-  // Pick the highest-rated backdrop from trending for the hero
   const heroItem = useMemo(() => {
     const results = trending.data?.results ?? [];
     return results.find((r) => r.backdrop_path) ?? results[0] ?? null;
@@ -55,7 +63,7 @@ export default function HomePage() {
 
   return (
     <div className="home">
-      <HeroBanner item={heroItem} />
+      <HeroBanner item={heroItem} loading={trending.loading} />
 
       <div className="home-content">
         <h2 className="home-greeting">{greeting}</h2>

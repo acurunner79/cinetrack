@@ -345,7 +345,7 @@ h1, h2, h3 { line-height: 1.2; }
 .theme-toggle:hover { color: var(--color-text-primary); border-color: var(--color-accent); }
 [data-theme="taytay"] .theme-toggle { border-color: var(--color-gold); color: var(--color-gold); background: var(--color-gold-light); }
 [data-theme="taytay"] .theme-toggle:hover { background: var(--color-champagne); }
-.theme-toggle-icon { font-size: 14px; line-height: 1; width: 20px; height: 20px; object-fit: cover; border-radius: 50%; vertical-align: middle; }
+.theme-toggle-icon { font-size: 14px; line-height: 1; }
 
 /* ================================================================
    SPINNER
@@ -1457,4 +1457,112 @@ h1, h2, h3 { line-height: 1.2; }
   .browse-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px 8px; }
   .browse-genre-pills { gap: 4px; }
   .browse-genre-pill { font-size: 0.72rem; padding: 3px 10px; }
+}
+
+/* ================================================================
+   SKELETON LOADING
+   ================================================================ */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-raised) 25%,
+    var(--color-border)         50%,
+    var(--color-surface-raised) 75%
+  );
+  background-size: 600px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  display: block;
+}
+
+.skeleton-text {
+  display: flex; flex-direction: column; gap: 8px;
+}
+
+.skeleton-card {
+  display: flex; flex-direction: column;
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 20px 12px;
+}
+
+.skeleton-shelf { margin-bottom: 2.5rem; }
+
+.skeleton-detail {
+  margin: -2rem -1.5rem 0;
+  width: calc(100% + 3rem);
+}
+
+/* ================================================================
+   BREADCRUMBS
+   ================================================================ */
+.breadcrumbs {
+  margin-bottom: 1.25rem;
+}
+
+.breadcrumbs-list {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: 4px; list-style: none;
+}
+
+.breadcrumbs-item {
+  display: flex; align-items: center; gap: 4px;
+}
+
+.breadcrumbs-link {
+  font-size: 0.8rem; color: var(--color-text-muted);
+  transition: color 0.15s;
+}
+.breadcrumbs-link:hover { color: var(--color-accent); }
+
+.breadcrumbs-current {
+  font-size: 0.8rem; color: var(--color-text-secondary);
+  max-width: 200px;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+
+.breadcrumbs-sep {
+  font-size: 0.75rem; color: var(--color-text-muted);
+  line-height: 1; opacity: 0.5;
+}
+
+/* ================================================================
+   INFINITE SCROLL
+   ================================================================ */
+.browse-sentinel {
+  display: flex; align-items: center; justify-content: center;
+  padding: 2rem 0; min-height: 80px;
+}
+
+.browse-end {
+  text-align: center; padding: 2rem 0;
+  font-size: 0.85rem; color: var(--color-text-muted);
+}
+
+/* Responsive skeleton grid */
+@media (max-width: 768px) {
+  .skeleton-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .skeleton-detail { margin: -1.25rem -1rem 0; width: calc(100% + 2rem); }
+}
+@media (max-width: 480px) {
+  .skeleton-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+  .skeleton-detail { margin: -1rem -0.875rem 0; width: calc(100% + 1.75rem); }
+}
+
+/* Hero skeleton state */
+.hero--skeleton {
+  background: none;
+}
+.hero--skeleton .skeleton {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  border-radius: 0;
 }
