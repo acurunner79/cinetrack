@@ -56,3 +56,12 @@ export function getSeason(tvId, seasonNumber) {
 export function getEpisode(tvId, seasonNumber, episodeNumber) {
   return api.get(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`);
 }
+
+// -------------------------------------------------------------------
+// People
+// append combined_credits to get both movie + TV credits in one call
+// -------------------------------------------------------------------
+export function getPerson(personId, append = "") {
+  const params = append ? { append_to_response: append } : {};
+  return api.get(`/person/${personId}`, params);
+}

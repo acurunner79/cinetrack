@@ -19,6 +19,7 @@ const MovieDetailPage = lazy(() => import("./pages/movies/MovieDetailPage"));
 const TvDetailPage    = lazy(() => import("./pages/tv/TvDetailPage"));
 const SearchPage      = lazy(() => import("./pages/search/SearchPage"));
 const WatchlistPage   = lazy(() => import("./pages/account/WatchlistPage"));
+const PersonPage      = lazy(() => import("./pages/people/PersonPage"));
 
 function Loading() {
   return (
@@ -70,6 +71,14 @@ const router = createBrowserRouter([
                 element: (
                   <Suspense fallback={<Loading />}>
                     <TvDetailPage />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "/people/:id",
+                element: (
+                  <Suspense fallback={<Loading />}>
+                    <PersonPage />
                   </Suspense>
                 ),
               },
