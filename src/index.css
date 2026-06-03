@@ -345,7 +345,7 @@ h1, h2, h3 { line-height: 1.2; }
 .theme-toggle:hover { color: var(--color-text-primary); border-color: var(--color-accent); }
 [data-theme="taytay"] .theme-toggle { border-color: var(--color-gold); color: var(--color-gold); background: var(--color-gold-light); }
 [data-theme="taytay"] .theme-toggle:hover { background: var(--color-champagne); }
-.theme-toggle-icon { font-size: 14px; line-height: 1; }
+.theme-toggle-icon { font-size: 14px; line-height: 1; width: 20px; height: 20px; object-fit: cover; border-radius: 50%; vertical-align: middle; }
 
 /* ================================================================
    SPINNER

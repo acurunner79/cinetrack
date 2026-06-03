@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ConfigProvider } from "./utils/tmdbImage";
 import { WatchlistProvider } from "./context/WatchlistContext";
+import { HistoryProvider } from "./context/HistoryContext";
 
 import RootLayout from "./layouts/RootLayout";
 import AuthLayout from "./layouts/AuthLayout";
@@ -133,9 +134,11 @@ export default function App() {
     <ThemeProvider>
       <ConfigProvider>
         <AuthProvider>
-          <WatchlistProvider>
-            <RouterProvider router={router} />
-          </WatchlistProvider>
+          <HistoryProvider>
+            <WatchlistProvider>
+              <RouterProvider router={router} />
+            </WatchlistProvider>
+          </HistoryProvider>
         </AuthProvider>
       </ConfigProvider>
     </ThemeProvider>

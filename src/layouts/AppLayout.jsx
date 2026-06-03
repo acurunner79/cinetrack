@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "../components/common/ThemeToggle";
 import SearchBar from "../components/nav/SearchBar";
 import Breadcrumbs from "../components/common/Breadcrumbs";
-import Breadcrumbs from "../components/common/Breadcrumbs";
+// import Breadcrumbs from "../components/common/Breadcrumbs";
 
 export default function AppLayout() {
   const { account, logout } = useAuth();
