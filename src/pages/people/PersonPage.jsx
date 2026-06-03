@@ -144,6 +144,9 @@ function Filmography({ credits }) {
 export default function PersonPage() {
   const { id } = useParams();
 
+  // All hooks must be called before any early returns
+  const [bioExpanded, setBioExpanded] = useState(false);
+
   const { data: person, loading, error } = useTmdb(
     () => getPerson(id, APPEND),
     [id]
@@ -171,8 +174,6 @@ export default function PersonPage() {
   const deathday    = formatDate(person.deathday);
   const knownFor    = sortedCredits(person.combined_credits?.cast ?? []).slice(0, 10);
 
-  // Truncate bio at ~600 chars with a read-more pattern
-  const [bioExpanded, setBioExpanded] = useState(false);
   const bioFull    = person.biography ?? "";
   const bioShort   = bioFull.length > 600 ? bioFull.slice(0, 600).trimEnd() + "…" : bioFull;
   const showToggle = bioFull.length > 600;
