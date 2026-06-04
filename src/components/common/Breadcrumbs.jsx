@@ -1,7 +1,6 @@
-import { Link, useLocation, useMatches } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useHistory } from "../../context/HistoryContext";
 
-// Static label map for known routes
 const ROUTE_LABELS = {
   "/":          "Home",
   "/movies":    "Movies",
@@ -13,32 +12,28 @@ const ROUTE_LABELS = {
 
 function buildCrumbs(pathname, history) {
   const crumbs = [{ label: "Home", href: "/" }];
-
   const segments = pathname.split("/").filter(Boolean);
   if (!segments.length) return crumbs;
 
-  // Build up path segment by segment
   let built = "";
   for (let i = 0; i < segments.length; i++) {
     built += `/${segments[i]}`;
-    const isLast    = i === segments.length - 1;
-    const isId      = /^\d+$/.test(segments[i]);
-    const parentPath = segments.slice(0, i).join("/");
+    const isLast = i === segments.length - 1;
+    const isId   = /^\d+$/.test(segments[i]);
 
     if (isId) {
-      // Look up the name from recently viewed history
       const mediaType =
         segments[i - 1] === "movies" ? "movie"
         : segments[i - 1] === "tv"   ? "tv"
         : segments[i - 1] === "people" ? "person"
         : null;
 
-      const historyEntry = mediaType
+      const entry = mediaType
         ? history.find((h) => h.id === Number(segments[i]) && h.mediaType === mediaType)
         : null;
 
       crumbs.push({
-        label: historyEntry?.title ?? "Detail",
+        label: entry?.title ?? "...",
         href:  isLast ? null : built,
       });
     } else {
@@ -50,20 +45,18 @@ function buildCrumbs(pathname, history) {
   return crumbs;
 }
 
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+function capitalize(s) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export default function Breadcrumbs() {
   const location = useLocation();
   const { history } = useHistory();
-
   const crumbs = buildCrumbs(location.pathname, history);
 
-  // Don't show breadcrumbs on home or top-level pages
-  if (crumbs.length <= 1) return null;
-  const isTopLevel = crumbs.length === 2 && !crumbs[1].href;
-  if (isTopLevel) return null;
+  // Only show when there are at least 2 crumbs beyond Home
+  // i.e. we're on a detail page like /movies/123
+  if (crumbs.length < 3) return null;
 
   return (
     <nav className="breadcrumbs" aria-label="Breadcrumb">
@@ -73,7 +66,7 @@ export default function Breadcrumbs() {
           return (
             <li key={i} className="breadcrumbs-item">
               {isLast || !crumb.href ? (
-                <span className="breadcrumbs-current" aria-current="page">
+                <span className="breadcrumbs-current" aria-current={isLast ? "page" : undefined}>
                   {crumb.label}
                 </span>
               ) : (

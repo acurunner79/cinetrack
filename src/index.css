@@ -1566,3 +1566,557 @@ h1, h2, h3 { line-height: 1.2; }
   height: 100%;
   border-radius: 0;
 }
+
+/* ================================================================
+   PAGE TRANSITIONS
+   ================================================================ */
+.page-transition {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.page-transition.page-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================================================================
+   CINEMATIC HERO BANNER
+   ================================================================ */
+.hero--cinematic {
+  position: relative;
+  width: 100%;
+  height: 560px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+/* Ken Burns zoom layer */
+.hero-zoom-layer {
+  position: absolute;
+  inset: -5%;
+  background-image: var(--hero-bg);
+  background-size: cover;
+  background-position: center 20%;
+  animation: kenBurns 20s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes kenBurns {
+  from { transform: scale(1);    }
+  to   { transform: scale(1.08); }
+}
+
+.hero--cinematic .hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top,  rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 40%, transparent 70%),
+    linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 60%);
+  z-index: 1;
+}
+
+[data-theme="taytay"] .hero--cinematic .hero-overlay {
+  background:
+    linear-gradient(to top, rgba(42,26,14,0.97) 0%, rgba(42,26,14,0.5) 40%, transparent 70%),
+    linear-gradient(to right, rgba(42,26,14,0.75) 0%, transparent 60%);
+}
+
+/* Animated content */
+.hero-content--animated {
+  position: relative;
+  z-index: 2;
+  animation: heroFadeUp 0.8s ease forwards;
+}
+
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* Hero action buttons */
+.hero-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+
+.hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: all 0.15s;
+  cursor: pointer;
+  border: none;
+}
+
+.hero-btn--primary {
+  background: #fff;
+  color: #000;
+}
+.hero-btn--primary:hover {
+  background: rgba(255,255,255,0.85);
+  transform: scale(1.03);
+}
+
+.hero-btn--trailer {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.4);
+  backdrop-filter: blur(4px);
+}
+.hero-btn--trailer:hover {
+  background: rgba(255,255,255,0.28);
+  border-color: rgba(255,255,255,0.7);
+  transform: scale(1.03);
+}
+
+[data-theme="taytay"] .hero-btn--primary {
+  background: linear-gradient(135deg, #e8621a, #c8972a);
+  color: #fff;
+}
+[data-theme="taytay"] .hero-btn--trailer {
+  border-color: rgba(200,151,42,0.6);
+  color: #fff;
+}
+
+/* Scroll hint */
+.hero-scroll-hint {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 2rem;
+  z-index: 2;
+  animation: bounce 2s ease-in-out infinite;
+}
+.hero-scroll-arrow {
+  font-size: 1.25rem;
+  color: rgba(255,255,255,0.4);
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(6px); }
+}
+
+/* Responsive hero */
+@media (max-width: 768px) {
+  .hero--cinematic { height: 420px; }
+}
+@media (max-width: 480px) {
+  .hero--cinematic { height: 320px; }
+  .hero-actions { gap: 0.5rem; }
+  .hero-btn { padding: 0.6rem 1rem; font-size: 0.82rem; }
+}
+
+/* ================================================================
+   TRAILER MODAL
+   ================================================================ */
+.trailer-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.trailer-modal-container {
+  width: 100%;
+  max-width: 960px;
+  animation: scaleIn 0.25s ease;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.trailer-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding: 0 2px;
+}
+
+.trailer-modal-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.8);
+}
+
+.trailer-modal-close {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, transform 0.15s;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+.trailer-modal-close:hover {
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.1);
+}
+
+.trailer-modal-frame-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.8);
+}
+
+.trailer-modal-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ================================================================
+   MEDIA CARD — NETFLIX HOVER EFFECTS
+   ================================================================ */
+
+/* Override — cards are now wrappers not Links */
+.media-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 140px;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              z-index 0s 0.25s;
+  z-index: 1;
+}
+
+.media-card--hovered {
+  transform: scale(1.05);
+  z-index: 10;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+              z-index 0s;
+}
+
+.media-card-link {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Play icon overlay — appears on hover */
+.media-card-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0);
+  border-radius: 8px 8px 0 0;
+  transition: background 0.2s;
+  pointer-events: none;
+}
+.media-card:hover .media-card-play-overlay {
+  background: rgba(0,0,0,0.35);
+}
+.media-card-play-icon {
+  font-size: 1.8rem;
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.2s, transform 0.2s;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  pointer-events: none;
+}
+.media-card:hover .media-card-play-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ================================================================
+   SHELF SCROLL ARROWS
+   ================================================================ */
+.shelf-scroll-wrap {
+  position: relative;
+}
+
+.shelf-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 40px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.15s;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.shelf-scroll-wrap:hover .shelf-arrow {
+  opacity: 1;
+}
+
+.shelf-arrow:hover {
+  background: rgba(0,0,0,0.9);
+}
+
+.shelf-arrow--left  { left: 0;  border-radius: 0 6px 6px 0; }
+.shelf-arrow--right { right: 0; border-radius: 6px 0 0 6px; }
+
+[data-theme="taytay"] .shelf-arrow {
+  background: rgba(253,246,238,0.85);
+  color: var(--color-accent);
+  border-color: rgba(200,151,42,0.2);
+}
+[data-theme="taytay"] .shelf-arrow:hover {
+  background: rgba(253,246,238,0.95);
+}
+
+/* Hide arrows on touch devices */
+@media (hover: none) {
+  .shelf-arrow { display: none; }
+}
+
+/* ================================================================
+   HOVER PREVIEW CARD
+   ================================================================ */
+.hover-card {
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.5);
+  animation: hoverCardIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none; /* card itself doesn't intercept mouse */
+}
+
+@keyframes hoverCardIn {
+  from { opacity: 0; transform: scale(0.92) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0);   }
+}
+
+[data-theme="taytay"] .hover-card {
+  border-color: rgba(200,151,42,0.25);
+  box-shadow: 0 16px 48px rgba(42,26,14,0.4), 0 4px 12px rgba(200,151,42,0.15);
+}
+
+.hover-card-backdrop-wrap {
+  position: relative;
+  width: 100%;
+  height: 170px;
+  overflow: hidden;
+  background: #111;
+}
+
+.hover-card-backdrop {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.hover-card-backdrop-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 60%);
+}
+
+/* Play button on backdrop */
+.hover-card-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: transform 0.15s, background 0.15s;
+  pointer-events: all;
+  padding-left: 3px; /* optical center the play triangle */
+}
+.hover-card-play:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  background: #fff;
+}
+
+.hover-card-body {
+  padding: 0.875rem;
+}
+
+.hover-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.hover-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  flex: 1;
+}
+[data-theme="taytay"] .hover-card-title { font-family: Georgia, serif; }
+
+.hover-card-actions {
+  flex-shrink: 0;
+  pointer-events: all;
+}
+
+.hover-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.hover-card-year {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.hover-card-rating-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 3px;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+}
+
+.hover-card-overview {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Don't show hover cards on touch/small screens */
+@media (hover: none), (max-width: 768px) {
+  .hover-card { display: none !important; }
+}
+
+  .hover-card-trailer-icon {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+/* ================================================================
+   MEDIA CARD — IN-CARD HOVER INTERACTIONS
+   ================================================================ */
+
+/* Dark overlay that appears on hover */
+.media-card-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0);
+  border-radius: 8px 8px 0 0;
+  transition: background 0.2s;
+  pointer-events: none;
+}
+.media-card--hovered .media-card-hover-overlay {
+  background: rgba(0,0,0,0.45);
+}
+
+/* Trailer button — sits at bottom of poster, slides up on hover */
+.media-card-trailer-btn {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.92);
+  color: #000;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  transition: opacity 0.2s, transform 0.2s, background 0.15s;
+  pointer-events: none;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.media-card--hovered .media-card-trailer-btn {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: all;
+}
+.media-card-trailer-btn:hover {
+  background: #fff;
+  transform: translateX(-50%) translateY(0) scale(1.05);
+}
+
+[data-theme="taytay"] .media-card-trailer-btn {
+  background: linear-gradient(135deg, #e8621a, #c8972a);
+  color: #fff;
+}
+[data-theme="taytay"] .media-card-trailer-btn:hover {
+  background: linear-gradient(135deg, #c94f10, #b08020);
+}
+
+.media-card-trailer-icon {
+  font-size: 0.65rem;
+  line-height: 1;
+}
+
+/* Watchlist button stays visible on hover too */
+.media-card--hovered .media-card-watchlist {
+  opacity: 1;
+}
+
+/* Remove the old play icon overlay — replaced by trailer button */
+.media-card-play-overlay,
+.media-card-play-icon { display: none; }
+
+/* Touch devices — never show hover state */
+@media (hover: none) {
+  .media-card-trailer-btn  { display: none; }
+  .media-card-hover-overlay { display: none; }
+}

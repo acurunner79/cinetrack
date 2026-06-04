@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "../components/common/ThemeToggle";
 import SearchBar from "../components/nav/SearchBar";
 import Breadcrumbs from "../components/common/Breadcrumbs";
-// import Breadcrumbs from "../components/common/Breadcrumbs";
+import PageTransition from "../components/ui/PageTransition";
 
 export default function AppLayout() {
   const { account, logout } = useAuth();
@@ -114,7 +114,9 @@ export default function AppLayout() {
 
       <main className="app-main">
         <Breadcrumbs />
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
     </div>
   );

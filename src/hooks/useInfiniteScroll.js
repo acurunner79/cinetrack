@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useEffect, useReducer, useRef } from "react";
 
 function reducer(state, action) {
   switch (action.type) {
@@ -10,11 +10,11 @@ function reducer(state, action) {
         : [...state.items, ...action.results];
       return {
         ...state,
-        loading:   false,
+        loading:    false,
         items,
-        page:      action.page,
+        page:       action.page,
         totalPages: action.totalPages,
-        hasMore:   action.page < action.totalPages,
+        hasMore:    action.page < action.totalPages,
       };
     }
     case "FETCH_ERROR":
@@ -35,36 +35,26 @@ const initialState = {
   error:      null,
 };
 
-// -------------------------------------------------------------------
-// useInfiniteScroll(fetchFn, deps)
-//
-// fetchFn(page) — async function that returns { results, total_pages }
-// deps          — reset accumulator when these change (e.g. [sort, genre])
-//
-// Returns:
-//   { items, loading, error, hasMore, sentinelRef }
-//
-// Place <div ref={sentinelRef} /> at the bottom of your list.
-// When it enters the viewport the next page is fetched automatically.
-// -------------------------------------------------------------------
 export function useInfiniteScroll(fetchFn, deps = []) {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const fetchRef  = useRef(fetchFn);
-  const abortRef  = useRef(null);
-  const pageRef   = useRef(0);
 
+  // Stable refs — avoid stale closures in the observer
+  const fetchRef   = useRef(fetchFn);
+  const stateRef   = useRef(state);
+  const abortRef   = useRef(null);
+  const pageRef    = useRef(0);
+  const sentinelEl = useRef(null);
+  const observerRef = useRef(null);
+
+  // Keep refs in sync with latest values
   useEffect(() => { fetchRef.current = fetchFn; });
-
-  // Reset when deps change (filter/sort change)
-  useEffect(() => {
-    abortRef.current?.abort();
-    pageRef.current = 0;
-    dispatch({ type: "RESET" });
-    loadNext();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+  useEffect(() => { stateRef.current = state; }, [state]);
 
   function loadNext() {
+    // Guard against concurrent fetches
+    if (stateRef.current.loading) return;
+    if (!stateRef.current.hasMore && pageRef.current > 0) return;
+
     const nextPage = pageRef.current + 1;
 
     abortRef.current?.abort();
@@ -79,7 +69,7 @@ export function useInfiniteScroll(fetchFn, deps = []) {
         pageRef.current = nextPage;
         dispatch({
           type:       "FETCH_SUCCESS",
-          results:    data.results ?? [],
+          results:    data.results    ?? [],
           page:       nextPage,
           totalPages: Math.min(data.total_pages ?? 1, 500),
         });
@@ -90,21 +80,51 @@ export function useInfiniteScroll(fetchFn, deps = []) {
       });
   }
 
-  // Intersection Observer — watches the sentinel element
-  const sentinelRef = useCallback((node) => {
+  // Reset + initial load when deps change
+  useEffect(() => {
+    abortRef.current?.abort();
+    pageRef.current = 0;
+    dispatch({ type: "RESET" });
+    // Small timeout lets RESET render before we start fetching
+    const t = setTimeout(() => loadNext(), 0);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+
+  // Stable sentinel callback ref — attaches observer once, reads fresh state via ref
+  function sentinelRef(node) {
+    // Disconnect previous observer if sentinel changes
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observerRef.current = null;
+    }
+
+    sentinelEl.current = node;
     if (!node) return;
-    const observer = new IntersectionObserver(
+
+    observerRef.current = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !state.loading && state.hasMore) {
+        if (
+          entries[0].isIntersecting &&
+          !stateRef.current.loading &&
+          stateRef.current.hasMore
+        ) {
           loadNext();
         }
       },
-      { rootMargin: "200px" }  // start loading 200px before sentinel is visible
+      { rootMargin: "300px" }
     );
-    observer.observe(node);
-    return () => observer.disconnect();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.loading, state.hasMore]);
+
+    observerRef.current.observe(node);
+  }
+
+  // Cleanup observer on unmount
+  useEffect(() => {
+    return () => {
+      observerRef.current?.disconnect();
+      abortRef.current?.abort();
+    };
+  }, []);
 
   return { ...state, sentinelRef };
 }

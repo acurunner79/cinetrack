@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTmdb } from "../../hooks/useTmdb";
 import {
@@ -8,10 +9,32 @@ import {
   getAiringToday,
 } from "../../api/media";
 import MediaShelf from "../../components/common/MediaShelf";
+import TrailerModal from "../../components/ui/TrailerModal";
 import { Skeleton } from "../../components/common/Skeleton";
 import { backdropUrl } from "../../utils/tmdbImage";
+import { useTmdb as useOnce } from "../../hooks/useTmdb";
+import { getMovie, getTv } from "../../api/media";
+import WatchlistButton from "../../components/common/WatchlistButton";
 
 function HeroBanner({ item, loading }) {
+  const [trailerKey, setTrailerKey] = useState(null);
+  const navigate = useNavigate();
+
+  // Fetch videos for the hero item
+  const isMovie  = item?.media_type !== "tv";
+  const { data: detail } = useTmdb(
+    () => item
+      ? isMovie
+        ? getMovie(item.id, "videos")
+        : getTv(item.id, "videos")
+      : Promise.resolve(null),
+    [item?.id]
+  );
+
+  const trailer = detail?.videos?.results?.find(
+    (v) => v.site === "YouTube" && v.type === "Trailer"
+  ) ?? detail?.videos?.results?.find((v) => v.site === "YouTube");
+
   if (loading) {
     return (
       <div className="hero hero--skeleton">
@@ -25,22 +48,67 @@ function HeroBanner({ item, loading }) {
   const title    = item.title ?? item.name;
   const overview = item.overview;
   const year     = (item.release_date ?? item.first_air_date)?.slice(0, 4);
-  const bg       = backdropUrl(item.backdrop_path, "lg");
+  const bg       = backdropUrl(item.backdrop_path, "xl");
+  const href     = item.media_type === "tv" ? `/tv/${item.id}` : `/movies/${item.id}`;
 
   return (
-    <div
-      className="hero"
-      style={{ "--hero-bg": bg ? `url(${bg})` : "none" }}
-    >
-      <div className="hero-overlay" />
-      <div className="hero-content">
-        <p className="hero-label">
-          {item.media_type === "tv" ? "TV Series" : "Film"} · {year}
-        </p>
-        <h1 className="hero-title">{title}</h1>
-        {overview && <p className="hero-overview">{overview}</p>}
+    <>
+      <div
+        className="hero hero--cinematic"
+        style={{ "--hero-bg": bg ? `url(${bg})` : "none" }}
+      >
+        {/* Ken Burns zoom layer */}
+        <div className="hero-zoom-layer" />
+        <div className="hero-overlay" />
+
+        <div className="hero-content hero-content--animated">
+          <p className="hero-label">
+            {item.media_type === "tv" ? "TV Series" : "Film"} · {year}
+          </p>
+          <h1 className="hero-title">{title}</h1>
+          {overview && <p className="hero-overview">{overview}</p>}
+
+          <div className="hero-actions">
+            <button
+              className="hero-btn hero-btn--primary"
+              onClick={() => navigate(href)}
+            >
+              <span>▶</span> View Details
+            </button>
+
+            {trailer && (
+              <button
+                className="hero-btn hero-btn--trailer"
+                onClick={() => setTrailerKey(trailer.key)}
+              >
+                <span>◉</span> Watch Trailer
+              </button>
+            )}
+
+            {(item.media_type === "movie" || item.media_type === "tv") && (
+              <WatchlistButton
+                mediaType={item.media_type === "tv" ? "tv" : "movie"}
+                mediaId={item.id}
+                size="lg"
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="hero-scroll-hint">
+          <span className="hero-scroll-arrow">↓</span>
+        </div>
       </div>
-    </div>
+
+      {trailerKey && (
+        <TrailerModal
+          videoKey={trailerKey}
+          title={title}
+          onClose={() => setTrailerKey(null)}
+        />
+      )}
+    </>
   );
 }
 
@@ -54,7 +122,7 @@ export default function HomePage() {
 
   const heroItem = useMemo(() => {
     const results = trending.data?.results ?? [];
-    return results.find((r) => r.backdrop_path) ?? results[0] ?? null;
+    return results.find((r) => r.backdrop_path && r.overview) ?? results[0] ?? null;
   }, [trending.data]);
 
   const greeting = account?.name || account?.username
@@ -74,7 +142,6 @@ export default function HomePage() {
           loading={trending.loading}
           error={trending.error}
         />
-
         <MediaShelf
           title="Now in cinemas"
           items={nowPlaying.data?.results}
@@ -82,7 +149,6 @@ export default function HomePage() {
           error={nowPlaying.error}
           type="movie"
         />
-
         <MediaShelf
           title="Top rated movies"
           items={topRated.data?.results}
@@ -90,7 +156,6 @@ export default function HomePage() {
           error={topRated.error}
           type="movie"
         />
-
         <MediaShelf
           title="Airing on TV today"
           items={airingToday.data?.results}
