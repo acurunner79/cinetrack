@@ -2037,7 +2037,7 @@ h1, h2, h3 { line-height: 1.2; }
   .hover-card { display: none !important; }
 }
 
-  .hover-card-trailer-icon {
+.hover-card-trailer-icon {
   font-size: 0.9rem;
   line-height: 1;
 }
@@ -2119,4 +2119,168 @@ h1, h2, h3 { line-height: 1.2; }
 @media (hover: none) {
   .media-card-trailer-btn  { display: none; }
   .media-card-hover-overlay { display: none; }
+}
+
+/* ================================================================
+   HERO CAROUSEL
+   ================================================================ */
+.hero-carousel {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Individual slide */
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+  pointer-events: none;
+}
+.hero-slide--active {
+  opacity: 1;
+  pointer-events: all;
+  position: relative;
+  height: 100%;
+}
+
+/* Slide content inherits hero-zoom-layer */
+.hero-slide .hero-zoom-layer {
+  position: absolute;
+  inset: -5%;
+  background-image: var(--hero-bg);
+  background-size: cover;
+  background-position: center 20%;
+  animation: kenBurns 20s ease-in-out infinite alternate;
+  will-change: transform;
+}
+.hero-slide .hero-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 40%, transparent 70%),
+    linear-gradient(to right, rgba(0,0,0,0.7) 0%, transparent 60%);
+  z-index: 1;
+}
+[data-theme="taytay"] .hero-slide .hero-overlay {
+  background:
+    linear-gradient(to top, rgba(42,26,14,0.97) 0%, rgba(42,26,14,0.5) 40%, transparent 70%),
+    linear-gradient(to right, rgba(42,26,14,0.75) 0%, transparent 60%);
+}
+.hero-slide .hero-content {
+  position: relative;
+  z-index: 2;
+  bottom: 2.5rem;
+  left: 2rem;
+  max-width: 520px;
+  position: absolute;
+  bottom: 5rem;
+}
+
+/* ── Nav arrows ─────────────────────────────────────────────────── */
+.hero-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 48px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  line-height: 1;
+  color: #fff;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.15s, transform 0.15s;
+  cursor: pointer;
+}
+.hero-carousel:hover .hero-nav-btn { opacity: 1; }
+.hero-nav-btn:hover {
+  background: rgba(0,0,0,0.7);
+  transform: translateY(-50%) scale(1.05);
+}
+.hero-nav-btn--left  { left: 1rem; }
+.hero-nav-btn--right { right: 1rem; }
+
+[data-theme="taytay"] .hero-nav-btn {
+  background: rgba(253,246,238,0.5);
+  color: var(--color-accent);
+  border-color: rgba(200,151,42,0.3);
+}
+[data-theme="taytay"] .hero-nav-btn:hover {
+  background: rgba(253,246,238,0.8);
+}
+
+/* ── Dot indicators ─────────────────────────────────────────────── */
+.hero-dots {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+}
+.hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, width 0.25s;
+}
+.hero-dot--active {
+  background: #fff;
+  width: 24px;
+  border-radius: 4px;
+  transform: none;
+}
+[data-theme="taytay"] .hero-dot--active {
+  background: var(--color-accent);
+}
+
+/* ── Progress bar ───────────────────────────────────────────────── */
+.hero-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  z-index: 10;
+}
+.hero-progress-bar {
+  height: 100%;
+  background: #fff;
+  width: 0%;
+  animation: heroProgress var(--duration, 8000ms) linear forwards;
+}
+@keyframes heroProgress {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+[data-theme="taytay"] .hero-progress-bar {
+  background: linear-gradient(to right, #e8621a, #c8972a);
+}
+
+/* Remove old scroll hint — replaced by dots */
+.hero-scroll-hint { display: none; }
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero-nav-btn { width: 36px; height: 56px; font-size: 1.8rem; opacity: 1; }
+  .hero-nav-btn--left  { left: 0.5rem; }
+  .hero-nav-btn--right { right: 0.5rem; }
+  .hero-slide .hero-content { left: 1.25rem; bottom: 4rem; }
+}
+@media (max-width: 480px) {
+  .hero-nav-btn { width: 30px; height: 44px; font-size: 1.5rem; }
+  .hero-slide .hero-content { left: 1rem; bottom: 3.5rem; right: 1rem; max-width: 100%; }
+  .hero-dots { bottom: 1rem; }
 }

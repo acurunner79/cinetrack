@@ -1,47 +1,38 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useTmdb } from "../../hooks/useTmdb";
 import {
-  getTrending,
-  getNowPlaying,
-  getTopRatedMovies,
-  getAiringToday,
+  getTrending, getNowPlaying, getTopRatedMovies, getAiringToday,
+  getMovie, getTv,
 } from "../../api/media";
 import MediaShelf from "../../components/common/MediaShelf";
 import TrailerModal from "../../components/ui/TrailerModal";
 import { Skeleton } from "../../components/common/Skeleton";
 import { backdropUrl } from "../../utils/tmdbImage";
-import { useTmdb as useOnce } from "../../hooks/useTmdb";
-import { getMovie, getTv } from "../../api/media";
 import WatchlistButton from "../../components/common/WatchlistButton";
 
-function HeroBanner({ item, loading }) {
-  const [trailerKey, setTrailerKey] = useState(null);
-  const navigate = useNavigate();
+const HERO_COUNT    = 6;   // how many trending items cycle through
+const AUTO_ADVANCE  = 8000; // ms between auto-advances
 
-  // Fetch videos for the hero item
-  const isMovie  = item?.media_type !== "tv";
+function HeroSlide({ item, active, direction }) {
+  const navigate = useNavigate();
+  const [trailerKey, setTrailerKey] = useState(null);
+
+  const isMovie = item?.media_type !== "tv";
+
   const { data: detail } = useTmdb(
     () => item
-      ? isMovie
-        ? getMovie(item.id, "videos")
-        : getTv(item.id, "videos")
+      ? isMovie ? getMovie(item.id, "videos") : getTv(item.id, "videos")
       : Promise.resolve(null),
     [item?.id]
   );
 
   const trailer = detail?.videos?.results?.find(
+    (v) => v.site === "YouTube" && v.type === "Trailer" && v.official
+  ) ?? detail?.videos?.results?.find(
     (v) => v.site === "YouTube" && v.type === "Trailer"
   ) ?? detail?.videos?.results?.find((v) => v.site === "YouTube");
-
-  if (loading) {
-    return (
-      <div className="hero hero--skeleton">
-        <Skeleton width="100%" height="100%" radius={0} />
-      </div>
-    );
-  }
 
   if (!item) return null;
 
@@ -50,14 +41,14 @@ function HeroBanner({ item, loading }) {
   const year     = (item.release_date ?? item.first_air_date)?.slice(0, 4);
   const bg       = backdropUrl(item.backdrop_path, "xl");
   const href     = item.media_type === "tv" ? `/tv/${item.id}` : `/movies/${item.id}`;
+  const mediaType = item.media_type === "tv" ? "tv" : "movie";
 
   return (
     <>
       <div
-        className="hero hero--cinematic"
+        className={`hero-slide ${active ? "hero-slide--active" : ""} hero-slide--${direction}`}
         style={{ "--hero-bg": bg ? `url(${bg})` : "none" }}
       >
-        {/* Ken Burns zoom layer */}
         <div className="hero-zoom-layer" />
         <div className="hero-overlay" />
 
@@ -69,60 +60,125 @@ function HeroBanner({ item, loading }) {
           {overview && <p className="hero-overview">{overview}</p>}
 
           <div className="hero-actions">
-            <button
-              className="hero-btn hero-btn--primary"
-              onClick={() => navigate(href)}
-            >
+            <button className="hero-btn hero-btn--primary" onClick={() => navigate(href)}>
               <span>▶</span> View Details
             </button>
-
             {trailer && (
-              <button
-                className="hero-btn hero-btn--trailer"
-                onClick={() => setTrailerKey(trailer.key)}
-              >
+              <button className="hero-btn hero-btn--trailer" onClick={() => setTrailerKey(trailer.key)}>
                 <span>◉</span> Watch Trailer
               </button>
             )}
-
-            {(item.media_type === "movie" || item.media_type === "tv") && (
-              <WatchlistButton
-                mediaType={item.media_type === "tv" ? "tv" : "movie"}
-                mediaId={item.id}
-                size="lg"
-              />
-            )}
+            <WatchlistButton mediaType={mediaType} mediaId={item.id} size="lg" />
           </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="hero-scroll-hint">
-          <span className="hero-scroll-arrow">↓</span>
         </div>
       </div>
 
       {trailerKey && (
-        <TrailerModal
-          videoKey={trailerKey}
-          title={title}
-          onClose={() => setTrailerKey(null)}
-        />
+        <TrailerModal videoKey={trailerKey} title={title} onClose={() => setTrailerKey(null)} />
       )}
     </>
+  );
+}
+
+function HeroCarousel({ items, loading }) {
+  const [index, setIndex]         = useState(0);
+  const [direction, setDirection] = useState("next");
+  const [paused, setPaused]       = useState(false);
+
+  const slides = items.slice(0, HERO_COUNT);
+
+  const go = useCallback((dir) => {
+    setDirection(dir);
+    setIndex((i) =>
+      dir === "next"
+        ? (i + 1) % slides.length
+        : (i - 1 + slides.length) % slides.length
+    );
+  }, [slides.length]);
+
+  // Auto-advance
+  useEffect(() => {
+    if (paused || slides.length < 2) return;
+    const t = setInterval(() => go("next"), AUTO_ADVANCE);
+    return () => clearInterval(t);
+  }, [paused, go, slides.length]);
+
+  if (loading) {
+    return (
+      <div className="hero hero--cinematic hero--skeleton">
+        <Skeleton width="100%" height="100%" radius={0} />
+      </div>
+    );
+  }
+
+  if (!slides.length) return null;
+
+  return (
+    <div
+      className="hero hero--cinematic hero-carousel"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      {/* Render only current slide */}
+      <HeroSlide
+        key={slides[index]?.id}
+        item={slides[index]}
+        active
+        direction={direction}
+      />
+
+      {/* Left arrow */}
+      <button
+        className="hero-nav-btn hero-nav-btn--left"
+        onClick={() => go("prev")}
+        aria-label="Previous"
+      >
+        ‹
+      </button>
+
+      {/* Right arrow */}
+      <button
+        className="hero-nav-btn hero-nav-btn--right"
+        onClick={() => go("next")}
+        aria-label="Next"
+      >
+        ›
+      </button>
+
+      {/* Dot indicators */}
+      <div className="hero-dots">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            className={`hero-dot ${i === index ? "hero-dot--active" : ""}`}
+            onClick={() => { setDirection(i > index ? "next" : "prev"); setIndex(i); }}
+            aria-label={`Go to slide ${i + 1}`}
+          />
+        ))}
+      </div>
+
+      {/* Progress bar — resets on each slide */}
+      {!paused && (
+        <div className="hero-progress" key={`${index}-${paused}`}>
+          <div className="hero-progress-bar" style={{ "--duration": `${AUTO_ADVANCE}ms` }} />
+        </div>
+      )}
+    </div>
   );
 }
 
 export default function HomePage() {
   const { account } = useAuth();
 
-  const trending    = useTmdb(() => getTrending("all", "day"),  []);
-  const nowPlaying  = useTmdb(() => getNowPlaying(),            []);
-  const topRated    = useTmdb(() => getTopRatedMovies(),        []);
-  const airingToday = useTmdb(() => getAiringToday(),           []);
+  const trending    = useTmdb(() => getTrending("all", "day"), []);
+  const nowPlaying  = useTmdb(() => getNowPlaying(),           []);
+  const topRated    = useTmdb(() => getTopRatedMovies(),       []);
+  const airingToday = useTmdb(() => getAiringToday(),          []);
 
-  const heroItem = useMemo(() => {
-    const results = trending.data?.results ?? [];
-    return results.find((r) => r.backdrop_path && r.overview) ?? results[0] ?? null;
+  const heroItems = useMemo(() => {
+    return (trending.data?.results ?? [])
+      .filter((r) => r.backdrop_path && r.overview)
+      .slice(0, HERO_COUNT);
   }, [trending.data]);
 
   const greeting = account?.name || account?.username
@@ -131,7 +187,7 @@ export default function HomePage() {
 
   return (
     <div className="home">
-      <HeroBanner item={heroItem} loading={trending.loading} />
+      <HeroCarousel items={heroItems} loading={trending.loading} />
 
       <div className="home-content">
         <h2 className="home-greeting">{greeting}</h2>
